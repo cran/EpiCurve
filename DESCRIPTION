@@ -1,0 +1,23 @@
+Package: EpiCurve
+Type: Package
+Title: Plot an Epidemic Curve
+Version: 1.0-0
+Date: 2017-03-14
+Authors@R: c(person("Jean Pierre", "Decorps", role = c("aut", "cre"),
+                     email = "jp.decorps@epiconcept.fr"),
+              person("Morgane","Vallee", role = "ctb", 
+                email = "m.vallee@epiconcept.fr")
+              )
+Description: Creates simple or stacked epidemic curves for daily, weekly or monthly incomes data.
+License: LGPL-3
+Encoding: UTF-8
+LazyData: true
+Depends: ggplot2, dplyr, ISOweek
+Imports: RColorBrewer
+NeedsCompilation: no
+Packaged: 2017-03-14 17:18:13 UTC; kdo
+Author: Jean Pierre Decorps [aut, cre],
+  Morgane Vallee [ctb]
+Maintainer: Jean Pierre Decorps <jp.decorps@epiconcept.fr>
+Repository: CRAN
+Date/Publication: 2017-03-14 20:13:24
