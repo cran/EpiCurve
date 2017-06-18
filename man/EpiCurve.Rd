@@ -6,7 +6,7 @@
 This function plot an epidemic curve with ggplot2}
 \usage{
 EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
-   period = NULL, cutorder = NULL, colors = NULL,
+   period = NULL, split = 1, cutorder = NULL, colors = NULL,
    title = NULL, xlabel = NULL, ylabel=NULL, note=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -15,7 +15,8 @@ EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
   \item{date}{character, name of Date column}
   \item{freq}{character, name of a column with a value to display}
   \item{cutvar}{character, name of a column with factors}
-  \item{period}{character, c("day","week", "month")}
+  \item{period}{character, c("hour", "day","week", "month")}
+  \item{split}{integer, c(1,2,3,4,6,8,12) Value for hourly split}
   \item{cutorder}{character vector of factors}
   \item{colors}{character vector of colors}
   \item{title}{character, title of the plot}
@@ -26,6 +27,8 @@ EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
 
 \details{
 When period is "week" the date MUST be in ISOweek format YYYY-WNN and library ISOweek is needed. When period is "month" the date MUST be formated YYYY-MM.
+
+When period is "hour" the date MUST be in timeDate format (YYYY-mm-dd HH:MM:SS) or (YYYY-mm-dd HH:MM)
 }
 
 \references{
