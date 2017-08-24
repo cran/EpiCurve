@@ -1,8 +1,8 @@
 Package: EpiCurve
 Type: Package
 Title: Plot an Epidemic Curve
-Version: 1.1-0
-Date: 2017-06-18
+Version: 2.0-1
+Date: 2017-08-24
 Authors@R: c(person("Jean Pierre", "Decorps", role = c("aut", "cre"),
                      email = "jp.decorps@epiconcept.fr"),
               person("Morgane","Vallee", role = "ctb", 
@@ -14,10 +14,12 @@ Encoding: UTF-8
 LazyData: true
 Depends: ggplot2, dplyr, ISOweek, scales, timeDate
 Imports: RColorBrewer
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2017-06-18 21:31:42 UTC; kdo
+Packaged: 2017-08-24 20:28:05 UTC; kdo
 Author: Jean Pierre Decorps [aut, cre],
   Morgane Vallee [ctb]
 Maintainer: Jean Pierre Decorps <jp.decorps@epiconcept.fr>
 Repository: CRAN
-Date/Publication: 2017-06-18 21:39:27 UTC
+Date/Publication: 2017-08-24 20:34:56 UTC

@@ -1,0 +1,416 @@
+---
+title: "Using EpiCurve"
+author: "jp.decorps@epiconcept.fr"
+date: "`r Sys.Date()`"
+output: rmarkdown::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Using EpiCurve}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+--------------------------------------------------------------------------------------------
+
+Epiconcept is made up of a team of doctors, epidemiologists, data scientists and digital specialists.
+For more than 20 years, Epiconcept has contributed to the improvement of public health by writing software, carrying out epidemiological studies, research, evaluation and training to better detect, monitor and prevent disease and to improve treatment.
+
+Epiconcept provides software, services and studies in the following areas:
+
+  - Software for managing public health programs,
+  - Secure cloud solutions for health data collection, reporting and processing,
+  - Research projects on vaccine preventable diseases, including measuring the effectiveness and impact of vaccines,
+  - Services in the field of epidemiology (protocols, analysis, training, etc.),
+  - Expertise in data analysis,
+  - Coaching and assistance to professionals in public health,
+  - Training (in software use and epidemiology: short and longer introductory modules, advanced courses, training through long-term practice).
+
+To achieve such goals Epiconcept :
+
+  - Recognized research organization,
+  - Certified datacenter for hosting personal health data,
+  - Training organisation.
+
+Epiconcept relies on  :
+
+  - Its expertise in epidemiology
+  - Its IT expertise,
+  - Ethical values rooted in practice (responsibility and quality of services, data security and confidentiality, scientific independence, etc.),
+  - Capabilities to answer and anticipate tomorrow’s challenges (Research - evaluation, e-health, Big Data, IoT, etc.),
+  - A desire to build long-term relationships with its clients and partners.
+
+Its current customers and partners include some of the greatest names in the world such as: Santé Publique France (and many public health organizations around the world), WHO, ECDC, AFD, MSF, World Bank, etc.
+
+--------------------------------------------------------------------------------------------
+
+
+\newpage
+# Package EpiCurve
+
+## Description
+EpiCurve allows the user to create epidemic curves from case-based and aggregated data. 
+
+## Details
+The EpiCurve function creates a graph of number of cases by time of illness (for example date of onset). Each case is represented by a square. EpiCurve allows the time unit for the x-axis to have hourly, daily, weekly or monthly intervals. The hourly interval can be split into 1, 2, 3, 4, 6, 8 or 12 hour time units.
+
+EpiCurve works on both case-based (one case per line) or aggregated data (where there is a count of cases for each date). With aggregated data, you need to specify the variable for the count of cases in the "freq" parameter.
+
+With case-based (non-aggregated data), the date format for EpiCurve can be:
+
+  - hourly: YYYY-MM-DD HH:MM or YYYY-mm-DD HH:MM:SS
+  - daily: YYYY-MM-DD
+  - monthly: YYYY-MM
+
+If the date format is daily or hourly, you can change and force the period for aggregation on the graph with the parameter "period" setted with "day", "week" or "month".
+
+For aggregated data, the date formats can be as above, but they can also be weekly: YYYY-Wnn. Here, we need to specify how the data are aggregated in the parameter "period". If we want to further aggregate the aggregated data for the epidemic curve (e.g. move from daily aggregated cases to weekly aggregated cases), we can specify the parameter "to.period".
+
+When the date format is hourly, the dataset is considered case-based, whether the "freq" parameter of the EpiCurve function is supplied or not. 
+
+
+## The EpiCurve function
+
+
+EpiCurve (
+
+          x,  
+          date = NULL,
+          freq = NULL,
+          cutvar = NULL,
+          period = NULL,
+          to.period = NULL,
+          split = 1,
+          cutorder = NULL,
+          colors = NULL,
+          title = NULL,
+          xlabel = NULL,
+          ylabel=NULL,
+          note=NULL
+          
+        )
+
+\newpage
+## Arguments
+
+Parameter | Description                  
+--------- | ---------------------------------------------------------------------------------      
+**x** | **data.frame** with at least one column with dates
+**date** | **character**, name of date column
+**freq** | **character**, name of a column with a value to display
+**cutvar** | **character**, name of a column with factors
+**period** | **character**, c("hour", "day","week", "month")
+**to.period** | **character**, Convert date period to another period only for aggregated data. If **period** is "day", **to.period** can be "week" or "month". If **period** is "week", **to.period** can be "month". 
+**split** | **integer**, c(1,2,3,4,6,8,12) value for hourly split
+**cutorder** | **character** vector of factors
+**colors** | **character**, vector of colors
+**title** | **character**, title of the plot
+**xlabel** | **character**, label for x axis
+**ylabel** | **character**, label for y axis
+**note**	 | **character**, add a note under the graph
+
+## Depends
+
+ggplot2, dplyr, ISOweek, scales, timeDate
+
+```{r message=FALSE, echo=FALSE}
+library(timeDate)
+library(EpiCurve)
+library(scales)
+library(knitr)
+```
+
+\newpage
+# Plot non-aggregated cases
+
+## Daily - non-aggregated cases
+
+```{r}
+DF <- read.csv("daily_unaggregated_cases.csv", stringsAsFactors=FALSE)
+kable(head(DF, 12))
+```
+
+```{r  fig.width=6, fig.height=4.5}
+EpiCurve(DF,
+         date = "UTS",
+         period = "day",
+         color ="#9900ef",
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+```
+
+\newpage
+
+## Hourly - non-aggregated cases
+
+```{r}
+DF <- read.csv("hourly_unaggregated_cases.csv", stringsAsFactors=FALSE)
+kable(head(DF, 12))
+```
+
+```{r fig.width=5.5, fig.height=4.2}
+EpiCurve(DF,
+         date = "UTS",
+         period = "hour",
+         split = 1,
+         color ="#339933",
+         ylabel="Number of cases",
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+```
+
+\newpage
+
+## Hourly - non-aggregated cases with factors
+
+```{r}
+DF <- read.csv("hourly_unaggregated_cases_factors.csv", stringsAsFactors=FALSE)
+kable(head(DF, 12))
+```
+
+```{r fig.width=5.5, fig.height=4.2}
+EpiCurve(DF,
+         date = "UTS",
+         period = "hour",
+         split = 1,
+         cutvar = "Confirmed",
+         color = c("#339933","#eebb00"),
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+```
+
+\newpage
+
+# Plot aggregated data
+
+## Daily 
+
+### Without factors
+
+```{r echo=FALSE, warning=FALSE, , message=FALSE}
+library(timeDate)
+library(ggplot2)
+library(EpiCurve)
+library(scales)
+library(knitr)
+
+```
+
+```{r, echo=FALSE, message=FALSE}
+DF <- read.csv("daily_aggregated_cases.csv", stringsAsFactors=FALSE)
+# DF$date <- as.Date(DF$date)
+kable(DF)
+
+```
+
+\newpage
+
+```{r}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "day",
+         ylabel="Number of cases",
+         xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve",
+         note = "Daily epidemic curve")
+
+
+```
+\newpage
+
+### With factors
+
+```{r, echo=FALSE, message=FALSE}
+DF <- read.csv("daily_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
+# DF$date <- as.Date(DF$date)
+kable(DF)
+```
+
+\newpage
+
+```{r}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         cutvar = "factor",
+         period = "day",
+         ylabel="Number of cases",
+         xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve",
+         note = "Daily epidemic curve")
+
+
+```
+
+\newpage
+## Weekly
+
+### Without factors
+
+```{r, echo=FALSE}
+DF <- read.csv("weekly_aggregated_cases.csv", stringsAsFactors=FALSE)
+kable(DF)
+
+```
+
+```{r fig.width=4.5, fig.height=4.5}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "week",
+         color=c("#990000"),
+         ylabel="Number of cases",
+         xlabel=sprintf("Du %s au %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve\n")
+
+```
+
+\newpage
+
+### With factors
+
+```{r, echo=FALSE}
+DF <- read.csv2("weekly_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
+kable(DF)
+
+```
+
+```{r  fig.width=4, fig.height=4}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "week",
+         cutvar = "factor",
+         color=c("Blue", "Red"),
+         ylabel="Cases",
+         xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve\n")
+
+```
+
+\newpage
+## Monthly
+
+### Without factors
+
+```{r, echo=FALSE}
+DF <- read.csv2("monthly_aggregated_cases.csv", stringsAsFactors=FALSE)
+kable(DF)
+
+```
+
+```{r fig.width=4.5, fig.height=4.5}
+EpiCurve(DF,
+         date = "date",
+#         freq = "value",
+         period = "month",
+         ylabel="Number of cases",
+         xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve\n")
+
+```
+
+\newpage
+### With factors
+
+```{r, echo=FALSE}
+DF <- read.csv2("monthly_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
+kable(DF)
+
+```
+
+```{r fig.width=4, fig.height=4}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         cutvar = "factor",
+         period = "month",
+         ylabel="Number of cases",
+         xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve\n")
+
+```
+
+\newpage
+# Converted period (aggragated cases)
+
+## "day" to "week"
+
+```{r, echo=FALSE, message=FALSE}
+DF <- read.csv("daily_aggregated_cases.csv", stringsAsFactors=FALSE)
+# DF$date <- as.Date(DF$date)
+kable(DF)
+
+```
+
+```{r fig.height=8, fig.width=8}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "day",
+         to.period = "week",
+         ylabel="Number of cases",
+         xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve",
+         note = "Daily epidemic curve")
+
+
+```
+
+\newpage
+## "day" to "month"
+
+```{r fig.height=7}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "day",
+         to.period = "month",
+         ylabel="Number of cases",
+         xlabel=sprintf("From %s o %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve",
+         note = "Daily epidemic curve")
+
+
+```
+
+\newpage
+## "week" to "month"
+
+
+```{r, echo=FALSE}
+DF <- read.csv("weekly_aggregated_cases.csv", stringsAsFactors=FALSE)
+kable(DF)
+
+```
+
+```{r fig.width=4.5, fig.height=4.5}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "week",
+         to.period = "month",
+         color=c("#990000"),
+         ylabel="Number of cases",
+         xlabel=sprintf("Du %s au %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve\n")
+
+```
+
+## "week" to "month" with factors
+
+```{r, echo=FALSE}
+DF <- read.csv2("weekly_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
+kable(DF)
+
+```
+
+```{r  fig.width=4, fig.height=4}
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "week",
+         to.period = "month",
+         cutvar = "factor",
+         color=c("Blue", "Red"),
+         ylabel="Cases",
+         xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
+         title = "Epidemic Curve\n")
+
+```

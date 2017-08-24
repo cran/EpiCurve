@@ -6,7 +6,7 @@
 This function plot an epidemic curve with ggplot2}
 \usage{
 EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
-   period = NULL, split = 1, cutorder = NULL, colors = NULL,
+   period = NULL, to.period = NULL, split = 1, cutorder = NULL, colors = NULL,
    title = NULL, xlabel = NULL, ylabel=NULL, note=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -16,6 +16,7 @@ EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
   \item{freq}{character, name of a column with a value to display}
   \item{cutvar}{character, name of a column with factors}
   \item{period}{character, c("hour", "day","week", "month")}
+  \item{to.period}{character, Convert date period to another period only for aggregated data. If period is "day", to.period can be "week" or "month". If period is "week", to.period can be "month".}
   \item{split}{integer, c(1,2,3,4,6,8,12) Value for hourly split}
   \item{cutorder}{character vector of factors}
   \item{colors}{character vector of colors}
@@ -29,6 +30,7 @@ EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
 When period is "week" the date MUST be in ISOweek format YYYY-WNN and library ISOweek is needed. When period is "month" the date MUST be formated YYYY-MM.
 
 When period is "hour" the date MUST be in timeDate format (YYYY-mm-dd HH:MM:SS) or (YYYY-mm-dd HH:MM)
+
 }
 
 \references{
@@ -43,24 +45,23 @@ When period is "hour" the date MUST be in timeDate format (YYYY-mm-dd HH:MM:SS) 
 
 \examples{
 # library(Epicurve)
-# library(ISOweek)
-#
-# DF <- read.csv("daily_cases.csv", stringsAsFactors=FALSE)
-# DF <- DF[1, ]
-# DF$date <- as.Date(DF$date)
-# DF_V <- DF[DF[,"factor"] == "Valid", 1:2]
-# DF_I <- DF[DF[,"factor"] == "Invalid", 1:2]
-# EpiCurve(DF,
-#    date = "date",
-#    freq = "value",
-#    cutvar = "factor",
-#    period = "day",
-#    cutorder = c("Invalid", "Valid"),
-#    color=c("#009900", "#000099"),
-#    ylabel="Number of cases",
-#    xlabel=sprintf("Du %s au %s", min(DF$date), max(DF$date)),
-#    title = "Epidemic Curve\n",
-#    note = "This is the Epidemic Curve of cases from 2016-03-01 to 2016-06-29")
+date <- seq(as.timeDate("2017-05-10 21:35:22"), as.timeDate("2017-05-12 06:15:12"), by="12 min")
+val <- rep(1, length(date))
+tri <- rep(c("Alive", "Died","Unknown"), length.out=length(date))
+DF <- data.frame(date, val, tri)
+names(DF) <- c("date","value", "tri")
+
+
+EpiCurve(DF,
+         date = "date",
+         freq = "value",
+         period = "hour",
+         split = 4,
+         cutvar = "tri",
+         ylabel="Number of cases",
+         xlabel= "From 2017-05-10 21:35:22 To 2017-05-12 06:15:12",
+         title = "Epidemic Curve")
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

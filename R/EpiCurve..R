@@ -1,13 +1,38 @@
+# ===========================================================================
+# Convert a date from one format to another
+# ===========================================================================
+date.convert <- function(x, from, to) {
+  D <- x
+  R = FALSE
+  if(from == "day") {
+    if (to == "week") {
+      D <- ISOweek(D)
+      R <- TRUE
+    } else if (to == "month") {
+      D <- as.character(as.Date(D), format="%Y-%m")
+      R <- TRUE
+    }
+  } else if (from == "week") {
+    if (to == "month") {
+      D = as.character(ISOweek2date(paste(D, "-1", sep="")), format="%Y-%m")
+      R = TRUE
+    }
+  }
 
+  list(R, D)
+}
+
+# ===========================================================================
+# Create an hourly * split sequence
+# ===========================================================================
 createSequence <- function(minTime, maxTime, split) {
   str_split = sprintf("%d hour", split)
   offset = sprintf("%02d%s", split-1, ":59:59")
-  strMinDate = as.character(minTime)
-  strMinTimeDateStart <-paste(strMinDate, "00:00", sep=" ")
-  strMinTimeDateEnd <- paste(strMinDate, offset, sep=" ")
-  strMaxDate = as.character(maxTime)
-  strMaxTimeDateEnd <-paste(strMaxDate, "23:59:59", sep=" ")
 
+  strMinTimeDateStart <-paste(substr(minTime, 1,10), "00:00:00", sep=" ")
+  strMinTimeDateEnd <- as.character(as.timeDate(strMinTimeDateStart) + 3600*(split-0.999999))
+  strMinTimeDateEnd <- paste(substr(strMinTimeDateEnd, 1,13), "59:59", sep=":")
+  strMaxTimeDateEnd <-paste(substr(maxTime,1,10), "23:59:59", sep=" ")
   TLow <- seq(as.timeDate(strMinTimeDateStart), as.timeDate(strMaxTimeDateEnd), by=str_split)
   THight <- seq(as.timeDate(strMinTimeDateEnd), as.timeDate(strMaxTimeDateEnd), by=str_split)
 
@@ -31,8 +56,8 @@ setFactors <- function(df1, df2) {
   }
 
   getFactor <- function(x) {
-    L <- df2$L
-    H <- df2$H
+    L <- as.character(df2$L)
+    H <- as.character(df2$H)
     D <- df2$D
     R <- c()
 
@@ -54,7 +79,7 @@ setFactors <- function(df1, df2) {
   }
 
   Date <- NULL
-  df1 <- df1 %>% mutate(DateFactor = getFactor(Date))
+  df1 <- df1 %>% mutate(DateFactor = getFactor(as.POSIXct(Date)))
   df1
 }
 
@@ -63,6 +88,7 @@ EpiCurve <- function(x,
                         freq=NULL,
                         cutvar=NULL,
                         period = NULL,
+                        to.period = NULL,
                         split = 1,
                         cutorder = NULL,
                         colors = NULL,
@@ -76,11 +102,90 @@ EpiCurve <- function(x,
   .cutorder <- cutorder
   .color = colors
 
+  # ---------------------------------------------------------------------------
+  # Rename vars of DF
+  # ---------------------------------------------------------------------------
 
-  if (is.null(.color)) {
-    .color <- rev(brewer.pal(9, "Spectral"))
+  if (!is.null(date)) {
+    names(DF)[names(DF)==date] <- "Date"
+  } else {
+    stop("Parameter 'date' is NULL!")
+  }
+  if (!is.null(cutvar)) {
+    names(DF)[names(DF)==cutvar] <- "Cut"
+  }
+  if (!is.null(freq)) {
+    names(DF)[names(DF)==freq] <- "Freq"
   }
 
+  # ---------------------------------------------------------------------------
+
+
+  if (is.null(.color)) {
+    .color <- c("#ff0000", "#0000ff", "#00ff00")
+  }
+
+
+  # ===========================================================================
+  # If freq is NULL, data are not aggregated, so we aggregate all cases by
+  # Date. The Date format MUST be %Y-%m-%d
+  # If cutvar is NOT NULL, cases are aggregated by Date and Cut
+  # After aggregation has been processed, dates are rewritten according to
+  # the value of period ("week", "month")
+  # ===========================================================================
+  if (is.null(freq)) {
+    if (is.null(cutvar)) {
+      DF <- DF %>%
+        group_by(Date) %>%
+        summarise(Freq=n()) %>%
+        as.data.frame()
+    } else {
+      DF <- DF %>%
+        group_by(Date, Cut) %>%
+        summarise(Freq=n()) %>%
+        as.data.frame()
+    }
+    # -------------------------------------------------------------------------
+    # rewrites Date and aggregate them again acording to 'period' value
+    # -------------------------------------------------------------------------
+    if (period == "week") {
+      DF$Date <- ISOweek(DF$Date)
+    }
+    else if (period == "month") {
+      DF$Date <-  strtrim(DF$Date, 7)
+    }
+    if (is.null(cutvar)) {
+      DF <- DF %>%
+        group_by(Date) %>%
+        summarise(Freq = sum(Freq)) %>%
+        as.data.frame()
+    }
+    else {
+      DF <- DF %>%
+        group_by(Date, Cut) %>%
+        summarise(Freq = sum(Freq)) %>%
+        as.data.frame()
+    }
+  } else {
+    if (!is.null(to.period)) {
+      ret <- date.convert(DF$Date, period, to.period)
+      if (ret[[1]] == TRUE) {
+        period <- to.period
+        DF$Date <- ret[[2]]
+        if (is.null(cutvar)) {
+          DF <- DF %>%
+            group_by(Date) %>%
+            summarise(Freq=sum(Freq)) %>%
+            as.data.frame()
+        } else {
+          DF <- DF %>%
+            group_by(Date, Cut) %>%
+            summarise(Freq=sum(Freq)) %>%
+            as.data.frame()
+        }
+      }
+    }
+  }
 
   if (!is.null(date)) {
     names(DF)[names(DF)==date] <- "Date"
@@ -90,17 +195,11 @@ EpiCurve <- function(x,
     else if(period == "month") {
       DF$Date <- as.Date(paste(DF$Date,"-01",sep=""))
     }
-    else if (period == "hour") {
-      DF$Date <- as.POSIXct(DF$Date)
-    }
-    else {
+    else if (period == "day") {
       DF$Date <- as.Date(DF$Date)
     }
   }
 
-  if (!is.null(freq)) {
-    names(DF)[names(DF)==freq] <- "Freq"
-  }
 
   if (!is.null(cutvar)) {
     names(DF)[names(DF)==cutvar] <- "Cut"
@@ -117,7 +216,9 @@ EpiCurve <- function(x,
   }
 
 
-  # Calcul du max après agrégation
+  # ===========================================================================
+  # Compute max value of "Freq" after data aggregation
+  # ===========================================================================
   if (!is.null(cutvar)) {
     TMP <- DF %>%
       dplyr::group_by(Date) %>%
@@ -129,10 +230,6 @@ EpiCurve <- function(x,
   }
 
 
-  # Calcul du nombre de ticks 'lisibles'
-  # TMP <- dplyr::distinct(DF, Date)
-  # N = nrow(DF)
-  # n_ticks = max(as.integer(log10(N)*10)-10, 1)
 
   if (period == "day") {
     if (max(DF$Date) - min(DF$Date) > 365) {
@@ -168,25 +265,26 @@ EpiCurve <- function(x,
       mutate(Date = Mois)
   }
 
-  # -------------------------------------------------------------------
-  # Hourly with or without splitting
-  # -------------------------------------------------------------------
+  # ===========================================================================
+  # Hourly with or without splitting and with or without factor
+  # ===========================================================================
   if (period == "hour") {
     DateFactor <- Date <- D <- NULL
 
     if (!(split %in% c(1,2,3,4,6,8,12))) {
       stop("split value MUST be in {1,2,3,4,6,8,12}")
     }
-    minDate = min(as.Date(DF$Date))
-    maxDate = max(as.Date(DF$Date))
+
+    DF$Date <- as.character(as.timeDate(DF$Date))
+    minDate <- as.character(min(as.timeDate(DF$Date)))
+    maxDate <- as.character(max(as.timeDate(DF$Date)))
+
     L <- createSequence(minDate, maxDate, split)
     DF <- setFactors(DF, L)
     L <- dplyr::rename(L, Date = D) %>%
       select(Date) %>%
       mutate(Date = levels(Date)) %>%
       as.data.frame()
-
-
     DF <- DF %>%
       group_by(DateFactor, Cut) %>%
       summarise(Freq=n()) %>%
@@ -207,19 +305,22 @@ EpiCurve <- function(x,
     }
   }
 
-
   # Init pseudo variables (in AES) for packaging
   Date <- Freq <- Day <- Mois <- Cut <- NULL
 
+  # ===========================================================================
+  # Plot the epidemic curve
+  # ===========================================================================
   P_ <- ggplot(arrange(DF, Cut), aes(x=Date, y=Freq, fill=factor(Cut)))
   P_ <- P_ +  geom_bar(stat='identity', width=1);
 
   P_ <- P_ + scale_fill_manual(values = .color, labels=.cutorder,
                                breaks=levels(DF$Cut), limits=levels(DF$Cut),
                                guide = guide_legend(reverse = TRUE)) +
-    scale_y_continuous(breaks= pretty_breaks(), expand = c(0,0)) +
+    scale_y_continuous(breaks= pretty_breaks(), expand = c(0,0))
 
-    geom_hline(yintercept=seq(1, MaxValue, by=1), colour="white", size=0.3)
+  P_ <- P_ + geom_hline(yintercept=seq(1, MaxValue, by=1), colour="white", size=0.3)
+
   if (nrow(DF) > 1) {
     P_ <- P_ + geom_vline(xintercept = seq(1.5, nrow(DF), by=1), colour="white", size=0.3)
   }
@@ -229,7 +330,9 @@ EpiCurve <- function(x,
     labs(title = title, fill = "") +
     coord_fixed(ratio=1) +
     theme_bw() +
+    labs(fill = cutvar) +
     theme(panel.border = element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
     theme(axis.text.x = element_text(angle=90))+
     theme(axis.line.x = element_line(colour="black", linetype="solid", size = 0.5),
           axis.line.y = element_line(colour="black", linetype="solid", size = 0.5))
