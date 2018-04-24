@@ -126,7 +126,7 @@ kable(DF)
 ## ----fig.width=4.5, fig.height=4.5---------------------------------------
 EpiCurve(DF,
          date = "date",
-#         freq = "value",
+         freq = "value",
          period = "month",
          ylabel="Number of cases",
          xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),

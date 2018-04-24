@@ -1,6 +1,26 @@
 # ===========================================================================
 # Convert a date from one format to another
 # ===========================================================================
+getFormat <- function(D) {
+
+  if (length(grep("[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}", D)) > 0) {
+    return ("hour")
+  }
+
+  if (length(grep("[0-9]{4}-[0-9]{2}-[0-9]{2}", D)) > 0) {
+    return ("day")
+  }
+
+  if (length(grep("[0-9]{4}-W[0-9]{2}", D, perl=TRUE)) > 0) {
+    return ("week")
+  }
+
+  if (length(grep("[0-9]{4}-[0-9]{2}", D)) > 0) {
+    return ("month")
+  }
+  return("unknown")
+}
+
 date.convert <- function(x, from, to) {
   D <- x
   R = FALSE
@@ -317,7 +337,7 @@ EpiCurve <- function(x,
   P_ <- P_ + scale_fill_manual(values = .color, labels=.cutorder,
                                breaks=levels(DF$Cut), limits=levels(DF$Cut),
                                guide = guide_legend(reverse = TRUE)) +
-    scale_y_continuous(breaks= pretty_breaks(), expand = c(0,0))
+    scale_y_continuous(breaks= pretty_breaks(ceiling(2*log2(MaxValue))), expand = c(0,0))
 
   P_ <- P_ + geom_hline(yintercept=seq(1, MaxValue, by=1), colour="white", size=0.3)
 
