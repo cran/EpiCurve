@@ -145,80 +145,82 @@ EpiCurve <- function(x,
     .color <- c("#ff0000", "#0000ff", "#00ff00")
   }
 
-
-  # ===========================================================================
-  # If freq is NULL, data are not aggregated, so we aggregate all cases by
-  # Date. The Date format MUST be %Y-%m-%d
-  # If cutvar is NOT NULL, cases are aggregated by Date and Cut
-  # After aggregation has been processed, dates are rewritten according to
-  # the value of period ("week", "month")
-  # ===========================================================================
-  if (is.null(freq)) {
-    if (is.null(cutvar)) {
-      DF <- DF %>%
-        group_by(Date) %>%
-        summarise(Freq=n()) %>%
-        as.data.frame()
+  if (period != "hour") {
+    # ===========================================================================
+    # If freq is NULL, data are not aggregated, so we aggregate all cases by
+    # Date. The Date format MUST be %Y-%m-%d
+    # If cutvar is NOT NULL, cases are aggregated by Date and Cut
+    # After aggregation has been processed, dates are rewritten according to
+    # the value of period ("week", "month")
+    # ===========================================================================
+    if (is.null(freq)) {
+      if (is.null(cutvar)) {
+        DF <- DF %>%
+          group_by(Date) %>%
+          summarise(Freq=n()) %>%
+          as.data.frame()
+      } else {
+        DF <- DF %>%
+          group_by(Date, Cut) %>%
+          summarise(Freq=n()) %>%
+          as.data.frame()
+      }
+      # -------------------------------------------------------------------------
+      # rewrites Date and aggregate them again acording to 'period' value
+      # -------------------------------------------------------------------------
+      if (period == "week") {
+        DF$Date <- ISOweek(DF$Date)
+      }
+      else if (period == "month") {
+        DF$Date <-  strtrim(DF$Date, 7)
+      }
+      if (is.null(cutvar)) {
+        DF <- DF %>%
+          group_by(Date) %>%
+          summarise(Freq = sum(Freq)) %>%
+          as.data.frame()
+      }
+      else {
+        DF <- DF %>%
+          group_by(Date, Cut) %>%
+          summarise(Freq = sum(Freq)) %>%
+          as.data.frame()
+      }
     } else {
-      DF <- DF %>%
-        group_by(Date, Cut) %>%
-        summarise(Freq=n()) %>%
-        as.data.frame()
-    }
-    # -------------------------------------------------------------------------
-    # rewrites Date and aggregate them again acording to 'period' value
-    # -------------------------------------------------------------------------
-    if (period == "week") {
-      DF$Date <- ISOweek(DF$Date)
-    }
-    else if (period == "month") {
-      DF$Date <-  strtrim(DF$Date, 7)
-    }
-    if (is.null(cutvar)) {
-      DF <- DF %>%
-        group_by(Date) %>%
-        summarise(Freq = sum(Freq)) %>%
-        as.data.frame()
-    }
-    else {
-      DF <- DF %>%
-        group_by(Date, Cut) %>%
-        summarise(Freq = sum(Freq)) %>%
-        as.data.frame()
-    }
-  } else {
-    if (!is.null(to.period)) {
-      ret <- date.convert(DF$Date, period, to.period)
-      if (ret[[1]] == TRUE) {
-        period <- to.period
-        DF$Date <- ret[[2]]
-        if (is.null(cutvar)) {
-          DF <- DF %>%
-            group_by(Date) %>%
-            summarise(Freq=sum(Freq)) %>%
-            as.data.frame()
-        } else {
-          DF <- DF %>%
-            group_by(Date, Cut) %>%
-            summarise(Freq=sum(Freq)) %>%
-            as.data.frame()
+      if (!is.null(to.period)) {
+        ret <- date.convert(DF$Date, period, to.period)
+        if (ret[[1]] == TRUE) {
+          period <- to.period
+          DF$Date <- ret[[2]]
+          if (is.null(cutvar)) {
+            DF <- DF %>%
+              group_by(Date) %>%
+              summarise(Freq=sum(Freq)) %>%
+              as.data.frame()
+          } else {
+            DF <- DF %>%
+              group_by(Date, Cut) %>%
+              summarise(Freq=sum(Freq)) %>%
+              as.data.frame()
+          }
         }
       }
     }
-  }
 
-  if (!is.null(date)) {
-    names(DF)[names(DF)==date] <- "Date"
-    if (period=="week") {
-      DF$Date <- ISOweek2date(paste(DF$Date, "-1", sep=""))
+    if (!is.null(date)) {
+      names(DF)[names(DF)==date] <- "Date"
+      if (period=="week") {
+        DF$Date <- ISOweek2date(paste(DF$Date, "-1", sep=""))
+      }
+      else if(period == "month") {
+        DF$Date <- as.Date(paste(DF$Date,"-01",sep=""))
+      }
+      else if (period == "day") {
+        DF$Date <- as.Date(DF$Date)
+      }
     }
-    else if(period == "month") {
-      DF$Date <- as.Date(paste(DF$Date,"-01",sep=""))
-    }
-    else if (period == "day") {
-      DF$Date <- as.Date(DF$Date)
-    }
-  }
+  } # end if(period != "hour")
+
 
 
   if (!is.null(cutvar)) {
@@ -235,21 +237,20 @@ EpiCurve <- function(x,
     DF$Cut <- rep("1 cas", length.out = nrow(DF))
   }
 
-
   # ===========================================================================
   # Compute max value of "Freq" after data aggregation
   # ===========================================================================
-  if (!is.null(cutvar)) {
-    TMP <- DF %>%
-      dplyr::group_by(Date) %>%
-      dplyr::summarize(total=sum(Freq)) %>%
-      as.data.frame()
-    MaxValue = max(TMP$total)
-  } else {
-    MaxValue = max(DF$Freq)
+  if (period != "hour") {
+    if (!is.null(cutvar)) {
+      TMP <- DF %>%
+        dplyr::group_by(Date) %>%
+        dplyr::summarize(total=sum(Freq)) %>%
+        as.data.frame()
+      MaxValue = max(TMP$total)
+    } else {
+      MaxValue = max(DF$Freq)
+    }
   }
-
-
 
   if (period == "day") {
     if (max(DF$Date) - min(DF$Date) > 365) {
@@ -265,26 +266,25 @@ EpiCurve <- function(x,
       mutate(Date = Day)
   }
 
-  if (period == "week") {
-    DW = data_frame(Date = seq(min(DF$Date), max(DF$Date), by="week"))
-    DW$Date <- ISOweek(DW$Date)
-    DF$Date <- ISOweek(DF$Date)
-    DF <- dplyr::left_join(x = DW, y = DF, by = "Date") %>%
-      as.data.frame()
-    DF$Freq[is.na(DF$Freq)] <- 0
+    if (period == "week") {
+      DW = data_frame(Date = seq(min(DF$Date), max(DF$Date), by="week"))
+      DW$Date <- ISOweek(DW$Date)
+      DF$Date <- ISOweek(DF$Date)
+      DF <- dplyr::left_join(x = DW, y = DF, by = "Date") %>%
+        as.data.frame()
+      DF$Freq[is.na(DF$Freq)] <- 0
 
-}
+    }
 
-  if (period == "month") {
-    DM = data_frame(Date = seq(min(DF$Date), max(DF$Date), by="month"))
-    DF <- dplyr::left_join(x = DM, y = DF, by = "Date") %>%
-      as.data.frame()
-    DF$Freq[is.na(DF$Freq)] <- 0
-    DF <- mutate(DF, Mois = format(Date, "%Y-%m")) %>%
-      mutate(Date = NULL) %>%
-      mutate(Date = Mois)
-  }
-
+    if (period == "month") {
+      DM = data_frame(Date = seq(min(DF$Date), max(DF$Date), by="month"))
+      DF <- dplyr::left_join(x = DM, y = DF, by = "Date") %>%
+        as.data.frame()
+      DF$Freq[is.na(DF$Freq)] <- 0
+      DF <- mutate(DF, Mois = format(Date, "%Y-%m")) %>%
+        mutate(Date = NULL) %>%
+        mutate(Date = Mois)
+    }
   # ===========================================================================
   # Hourly with or without splitting and with or without factor
   # ===========================================================================
@@ -295,12 +295,16 @@ EpiCurve <- function(x,
       stop("split value MUST be in {1,2,3,4,6,8,12}")
     }
 
+    # cat("DF origin:", nrow(DF), "\n")
+
     DF$Date <- as.character(as.timeDate(DF$Date))
     minDate <- as.character(min(as.timeDate(DF$Date)))
     maxDate <- as.character(max(as.timeDate(DF$Date)))
 
     L <- createSequence(minDate, maxDate, split)
+    # cat("DF :", nrow(DF), "\n")
     DF <- setFactors(DF, L)
+    # return(DF)
     L <- dplyr::rename(L, Date = D) %>%
       select(Date) %>%
       mutate(Date = levels(Date)) %>%
