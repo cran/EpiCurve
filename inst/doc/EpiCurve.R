@@ -12,7 +12,7 @@ kable(head(DF, 12))
 EpiCurve(DF,
          date = "UTS",
          period = "day",
-         color ="#9900ef",
+         colors ="#9900ef",
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 
 ## ------------------------------------------------------------------------
@@ -24,7 +24,7 @@ EpiCurve(DF,
          date = "UTS",
          period = "hour",
          split = 1,
-         color ="#339933",
+         colors ="#339933",
          ylabel="Number of cases",
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 
@@ -38,7 +38,7 @@ EpiCurve(DF,
          period = "hour",
          split = 1,
          cutvar = "Confirmed",
-         color = c("#339933","#eebb00"),
+         colors = c("#339933","#eebb00"),
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 
 ## ----echo=FALSE, warning=FALSE, , message=FALSE--------------------------
@@ -95,7 +95,7 @@ EpiCurve(DF,
          date = "date",
          freq = "value",
          period = "week",
-         color=c("#990000"),
+         colors=c("#990000"),
          ylabel="Number of cases",
          xlabel=sprintf("Du %s au %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")
@@ -112,7 +112,7 @@ EpiCurve(DF,
          freq = "value",
          period = "week",
          cutvar = "factor",
-         color=c("Blue", "Red"),
+         colors=c("Blue", "Red"),
          ylabel="Cases",
          xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")
@@ -192,7 +192,7 @@ EpiCurve(DF,
          freq = "value",
          period = "week",
          to.period = "month",
-         color=c("#990000"),
+         colors=c("#990000"),
          ylabel="Number of cases",
          xlabel=sprintf("Du %s au %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")
@@ -210,7 +210,7 @@ EpiCurve(DF,
          period = "week",
          to.period = "month",
          cutvar = "factor",
-         color=c("Blue", "Red"),
+         colors=c("Blue", "Red"),
          ylabel="Cases",
          xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")

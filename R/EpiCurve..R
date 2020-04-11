@@ -59,7 +59,7 @@ createSequence <- function(minTime, maxTime, split) {
   F1 <- format(TLow, "%d %H:%M")
   F2 <- format(THight, "%H:%M")
   Dico <- paste(F1, F2, sep="-")
-  df <- data.frame(TLow, THight, Dico)
+  df <- data.frame(TLow, THight, Dico, stringsAsFactors=TRUE)
   colnames(df) <- c("L", "H", "D")
   df
 }
@@ -101,7 +101,7 @@ setFactors <- function(df1, df2) {
   Date <- NULL
   df1 <- df1 %>% mutate(DateFactor = getFactor(as.POSIXct(Date)))
   df1
-}
+} # --- END setFactors
 
 EpiCurve <- function(x,
                         date = NULL,
@@ -257,9 +257,9 @@ EpiCurve <- function(x,
       print("Error: Too much days, must be < 366")
       return(FALSE)
     }
-    DW = data_frame(Date = seq(min(DF$Date), max(DF$Date), by="day"))
+    DW = tibble(Date = seq(min(DF$Date), max(DF$Date), by="day"))
     DF <- dplyr::left_join(x = DW, y = DF, by = "Date") %>%
-      as.data.frame()
+      as.data.frame(stringsAsFactors=TRUE)
     DF$Freq[is.na(DF$Freq)] <- 0
     DF <- mutate(DF, Day = format(Date, "%Y-%m-%d")) %>%
       mutate(Date = NULL) %>%
@@ -267,7 +267,7 @@ EpiCurve <- function(x,
   }
 
     if (period == "week") {
-      DW = data_frame(Date = seq(min(DF$Date), max(DF$Date), by="week"))
+      DW = tibble(Date = seq(min(DF$Date), max(DF$Date), by="week"), stringsAsFactors=TRUE)
       DW$Date <- ISOweek(DW$Date)
       DF$Date <- ISOweek(DF$Date)
       DF <- dplyr::left_join(x = DW, y = DF, by = "Date") %>%
@@ -277,9 +277,9 @@ EpiCurve <- function(x,
     }
 
     if (period == "month") {
-      DM = data_frame(Date = seq(min(DF$Date), max(DF$Date), by="month"))
+      DM = tibble(Date = seq(min(DF$Date), max(DF$Date), by="month"))
       DF <- dplyr::left_join(x = DM, y = DF, by = "Date") %>%
-        as.data.frame()
+        as.data.frame(, stringsAsFactors=TRUE)
       DF$Freq[is.na(DF$Freq)] <- 0
       DF <- mutate(DF, Mois = format(Date, "%Y-%m")) %>%
         mutate(Date = NULL) %>%

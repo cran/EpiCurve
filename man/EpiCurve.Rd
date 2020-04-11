@@ -40,15 +40,15 @@ When period is "hour" the date MUST be in timeDate format (YYYY-mm-dd HH:MM:SS) 
 
 }
 \author{
-  <jp.decorps@epiconcept.fr> & <m.vallee@epiconcept.fr>
+  <jean.pierre.decorps@gmail.com>
 }
 
 \examples{
-# library(Epicurve)
+# library(EpiCurve)
 date <- seq(as.timeDate("2017-05-10 21:35:22"), as.timeDate("2017-05-12 06:15:12"), by="12 min")
 val <- rep(1, length(date))
 tri <- rep(c("Alive", "Died","Unknown"), length.out=length(date))
-DF <- data.frame(date, val, tri)
+DF <- data.frame(date, val, tri, stringsAsFactors=TRUE)
 names(DF) <- c("date","value", "tri")
 
 

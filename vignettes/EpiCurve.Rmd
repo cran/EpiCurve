@@ -1,6 +1,6 @@
 ---
 title: "Using EpiCurve"
-author: "jp.decorps@epiconcept.fr"
+author: "jean.pierre.decorps@gmail.com"
 date: "`r Sys.Date()`"
 output: rmarkdown::pdf_document
 vignette: >
@@ -8,37 +8,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
---------------------------------------------------------------------------------------------
-
-Epiconcept is made up of a team of doctors, epidemiologists, data scientists and digital specialists.
-For more than 20 years, Epiconcept has contributed to the improvement of public health by writing software, carrying out epidemiological studies, research, evaluation and training to better detect, monitor and prevent disease and to improve treatment.
-
-Epiconcept provides software, services and studies in the following areas:
-
-  - Software for managing public health programs,
-  - Secure cloud solutions for health data collection, reporting and processing,
-  - Research projects on vaccine preventable diseases, including measuring the effectiveness and impact of vaccines,
-  - Services in the field of epidemiology (protocols, analysis, training, etc.),
-  - Expertise in data analysis,
-  - Coaching and assistance to professionals in public health,
-  - Training (in software use and epidemiology: short and longer introductory modules, advanced courses, training through long-term practice).
-
-To achieve such goals Epiconcept :
-
-  - Recognized research organization,
-  - Certified datacenter for hosting personal health data,
-  - Training organisation.
-
-Epiconcept relies on  :
-
-  - Its expertise in epidemiology
-  - Its IT expertise,
-  - Ethical values rooted in practice (responsibility and quality of services, data security and confidentiality, scientific independence, etc.),
-  - Capabilities to answer and anticipate tomorrow’s challenges (Research - evaluation, e-health, Big Data, IoT, etc.),
-  - A desire to build long-term relationships with its clients and partners.
-
-Its current customers and partners include some of the greatest names in the world such as: Santé Publique France (and many public health organizations around the world), WHO, ECDC, AFD, MSF, World Bank, etc.
 
 --------------------------------------------------------------------------------------------
 
@@ -80,7 +49,7 @@ EpiCurve (
           to.period = NULL,
           split = 1,
           cutorder = NULL,
-          colors = NULL,
+          colorss = NULL,
           title = NULL,
           xlabel = NULL,
           ylabel=NULL,
@@ -101,7 +70,7 @@ Parameter | Description
 **to.period** | **character**, Convert date period to another period only for aggregated data. If **period** is "day", **to.period** can be "week" or "month". If **period** is "week", **to.period** can be "month". 
 **split** | **integer**, c(1,2,3,4,6,8,12) value for hourly split
 **cutorder** | **character** vector of factors
-**colors** | **character**, vector of colors
+**colorss** | **character**, vector of colorss
 **title** | **character**, title of the plot
 **xlabel** | **character**, label for x axis
 **ylabel** | **character**, label for y axis
@@ -132,7 +101,7 @@ kable(head(DF, 12))
 EpiCurve(DF,
          date = "UTS",
          period = "day",
-         color ="#9900ef",
+         colors ="#9900ef",
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 ```
 
@@ -150,7 +119,7 @@ EpiCurve(DF,
          date = "UTS",
          period = "hour",
          split = 1,
-         color ="#339933",
+         colors ="#339933",
          ylabel="Number of cases",
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 ```
@@ -170,7 +139,7 @@ EpiCurve(DF,
          period = "hour",
          split = 1,
          cutvar = "Confirmed",
-         color = c("#339933","#eebb00"),
+         colors = c("#339933","#eebb00"),
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 ```
 
@@ -254,7 +223,7 @@ EpiCurve(DF,
          date = "date",
          freq = "value",
          period = "week",
-         color=c("#990000"),
+         colors=c("#990000"),
          ylabel="Number of cases",
          xlabel=sprintf("Du %s au %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")
@@ -277,7 +246,7 @@ EpiCurve(DF,
          freq = "value",
          period = "week",
          cutvar = "factor",
-         color=c("Blue", "Red"),
+         colors=c("Blue", "Red"),
          ylabel="Cases",
          xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")
@@ -386,7 +355,7 @@ EpiCurve(DF,
          freq = "value",
          period = "week",
          to.period = "month",
-         color=c("#990000"),
+         colors=c("#990000"),
          ylabel="Number of cases",
          xlabel=sprintf("Du %s au %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")
@@ -408,7 +377,7 @@ EpiCurve(DF,
          period = "week",
          to.period = "month",
          cutvar = "factor",
-         color=c("Blue", "Red"),
+         colors=c("Blue", "Red"),
          ylabel="Cases",
          xlabel=sprintf("From %s to %s", min(DF$date), max(DF$date)),
          title = "Epidemic Curve\n")
