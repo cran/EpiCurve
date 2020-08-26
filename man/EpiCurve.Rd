@@ -7,7 +7,7 @@ This function plot an epidemic curve with ggplot2}
 \usage{
 EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
    period = NULL, to.period = NULL, split = 1, cutorder = NULL, colors = NULL,
-   title = NULL, xlabel = NULL, ylabel=NULL, note=NULL)
+   title = NULL, xlabel = NULL, ylabel=NULL, note=NULL, square = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,6 +24,8 @@ EpiCurve(x, date = NULL,freq = NULL, cutvar = NULL,
   \item{xlabel}{character, label for x axis}
   \item{ylabel}{character, label for y axis}
   \item{note}{character, add a note under the graph}
+  \item{square}{boolean, If TRUE (default) squares are used to plot the curve, else if the number of cases is too hight please use square = FALSE}
+
 }
 
 \details{

@@ -49,13 +49,19 @@ createSequence <- function(minTime, maxTime, split) {
   str_split = sprintf("%d hour", split)
   offset = sprintf("%02d%s", split-1, ":59:59")
 
+  minmore = 3600 * split * 2
+  #strMinTimeDateStart <-as.character(round(as.timeDate(minTime)-minmore, "hours"))
+  # strMinTimeDateEnd <- as.character(round(as.timeDate(maxTime)+minmore, "hours") - 1)
   strMinTimeDateStart <-paste(substr(minTime, 1,10), "00:00:00", sep=" ")
   strMinTimeDateEnd <- as.character(as.timeDate(strMinTimeDateStart) + 3600*(split-0.999999))
   strMinTimeDateEnd <- paste(substr(strMinTimeDateEnd, 1,13), "59:59", sep=":")
+
   strMaxTimeDateEnd <-paste(substr(maxTime,1,10), "23:59:59", sep=" ")
   TLow <- seq(as.timeDate(strMinTimeDateStart), as.timeDate(strMaxTimeDateEnd), by=str_split)
   THight <- seq(as.timeDate(strMinTimeDateEnd), as.timeDate(strMaxTimeDateEnd), by=str_split)
-
+  # print(TLow)
+  # print(THight)
+  # return(T)
   F1 <- format(TLow, "%d %H:%M")
   F2 <- format(THight, "%H:%M")
   Dico <- paste(F1, F2, sep="-")
@@ -115,7 +121,8 @@ EpiCurve <- function(x,
                         title = NULL,
                         xlabel = NULL,
                         ylabel=NULL,
-                        note = NULL) {
+                        note = NULL,
+                     square = TRUE) {
 
 
   DF <- x
@@ -263,7 +270,12 @@ EpiCurve <- function(x,
     DF$Freq[is.na(DF$Freq)] <- 0
     DF <- mutate(DF, Day = format(Date, "%Y-%m-%d")) %>%
       mutate(Date = NULL) %>%
-      mutate(Date = Day)
+      mutate(Date = as.Date(Day, format= "%Y-%m-%d"))
+    cat("Day\n")
+    str(DF)
+    minDate = min(DF$Date)
+    maxDate = max(DF$Date)
+#    return(DF)
   }
 
     if (period == "week") {
@@ -335,25 +347,43 @@ EpiCurve <- function(x,
   # ===========================================================================
   # Plot the epidemic curve
   # ===========================================================================
-  P_ <- ggplot(arrange(DF, Cut), aes(x=Date, y=Freq, fill=factor(Cut)))
-  P_ <- P_ +  geom_bar(stat='identity', width=1);
+  # P_ <- ggplot(arrange(DF, Cut), aes(x=Date, y=Freq, fill=factor(Cut)))
+  # P_ <- P_ +  geom_bar(stat='identity', width=.9);
+  #
+  # P_ <- P_ + scale_fill_manual(values = .color, labels=.cutorder,
+  #                              breaks=levels(DF$Cut), limits=levels(DF$Cut),
+  #                              guide = guide_legend(reverse = TRUE)) +
+  #   scale_y_continuous(breaks= pretty_breaks(ceiling(2*log2(MaxValue))), expand = c(0,0))
+
+  P_ <- ggplot(DF, aes(x=Date, y=Freq, fill=factor(Cut)))
+  P_ <- P_ +  geom_bar(stat='identity');
 
   P_ <- P_ + scale_fill_manual(values = .color, labels=.cutorder,
                                breaks=levels(DF$Cut), limits=levels(DF$Cut),
                                guide = guide_legend(reverse = TRUE)) +
     scale_y_continuous(breaks= pretty_breaks(ceiling(2*log2(MaxValue))), expand = c(0,0))
 
-  P_ <- P_ + geom_hline(yintercept=seq(1, MaxValue, by=1), colour="white", size=0.3)
-
-  if (nrow(DF) > 1) {
-    P_ <- P_ + geom_vline(xintercept = seq(1.5, nrow(DF), by=1), colour="white", size=0.3)
+  if(period == "day") {
+    P_ <- P_ + scale_x_date(date_breaks = "1 week", date_labels = "%m-%d")
   }
+
+  if (square == TRUE) {
+    P_ <- P_ + geom_hline(yintercept=seq(1, MaxValue, by=1), colour="white", size=0.3)
+    if (nrow(DF) > 1) {
+      P_ <- P_ + geom_vline(xintercept = seq(1.5, nrow(DF), by=1), colour="white", size=0.3)
+    }
+  }
+
+
   note <- gsub('(.{1,90})(\\s|$)', '\\1\n', note)
   P_ <- P_ + xlab(paste(xlabel, note, sep="\n\n")) +
     ylab(ylabel) +
-    labs(title = title, fill = "") +
-    coord_fixed(ratio=1) +
-    theme_bw() +
+    labs(title = title, fill = "")
+    if (square == TRUE) {
+      P_ <- P_ + coord_fixed(ratio=1)
+    }
+
+  P_ <- P_ + theme_bw() +
     labs(fill = cutvar) +
     theme(panel.border = element_blank()) +
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +

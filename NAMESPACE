@@ -1,4 +1,4 @@
 export(EpiCurve)
-
+importFrom("utils", "str")
 import("ggplot2","RColorBrewer", "dplyr", "ISOweek", "timeDate", "scales")
 

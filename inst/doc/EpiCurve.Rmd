@@ -49,11 +49,12 @@ EpiCurve (
           to.period = NULL,
           split = 1,
           cutorder = NULL,
-          colorss = NULL,
+          colors = NULL,
           title = NULL,
           xlabel = NULL,
-          ylabel=NULL,
-          note=NULL
+          ylabel = NULL,
+          note = NULL,
+          square = TRUE
           
         )
 
@@ -70,11 +71,12 @@ Parameter | Description
 **to.period** | **character**, Convert date period to another period only for aggregated data. If **period** is "day", **to.period** can be "week" or "month". If **period** is "week", **to.period** can be "month". 
 **split** | **integer**, c(1,2,3,4,6,8,12) value for hourly split
 **cutorder** | **character** vector of factors
-**colorss** | **character**, vector of colorss
+**colors** | **character**, vector of colorss
 **title** | **character**, title of the plot
 **xlabel** | **character**, label for x axis
 **ylabel** | **character**, label for y axis
 **note**	 | **character**, add a note under the graph
+**square**	 | **boolean**, If TRUE (default) squares are used to plot the curve, else if the number of cases is too hight please use square = FALSE.
 
 ## Depends
 
@@ -99,11 +101,22 @@ kable(head(DF, 12))
 
 ```{r  fig.width=6, fig.height=4.5}
 EpiCurve(DF,
+         date = "UTS", period = "day", colors ="#9900ef",
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+```
+
+**With no squares**
+
+```{r  fig.width=6, fig.height=4.5}
+EpiCurve(DF,
          date = "UTS",
          period = "day",
          colors ="#9900ef",
-         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)),
+         square = F)
 ```
+
+
 
 \newpage
 
@@ -142,6 +155,20 @@ EpiCurve(DF,
          colors = c("#339933","#eebb00"),
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 ```
+
+**With no squares**
+
+```{r fig.width=5.5, fig.height=4.2}
+EpiCurve(DF,
+         date = "UTS",
+         period = "hour",
+         split = 1,
+         cutvar = "Confirmed",
+         colors = c("#339933","#eebb00"),
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)),
+         square = FALSE)
+```
+
 
 \newpage
 

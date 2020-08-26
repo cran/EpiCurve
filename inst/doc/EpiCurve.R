@@ -10,10 +10,16 @@ kable(head(DF, 12))
 
 ## ----fig.width=6, fig.height=4.5-----------------------------------------
 EpiCurve(DF,
+         date = "UTS", period = "day", colors ="#9900ef",
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+
+## ----fig.width=6, fig.height=4.5-----------------------------------------
+EpiCurve(DF,
          date = "UTS",
          period = "day",
          colors ="#9900ef",
-         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)),
+         square = F)
 
 ## ------------------------------------------------------------------------
 DF <- read.csv("hourly_unaggregated_cases.csv", stringsAsFactors=FALSE)
@@ -40,6 +46,16 @@ EpiCurve(DF,
          cutvar = "Confirmed",
          colors = c("#339933","#eebb00"),
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
+
+## ----fig.width=5.5, fig.height=4.2---------------------------------------
+EpiCurve(DF,
+         date = "UTS",
+         period = "hour",
+         split = 1,
+         cutvar = "Confirmed",
+         colors = c("#339933","#eebb00"),
+         xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)),
+         square = FALSE)
 
 ## ----echo=FALSE, warning=FALSE, , message=FALSE--------------------------
 library(timeDate)
