@@ -1,19 +1,19 @@
-## ----message=FALSE, echo=FALSE-------------------------------------------
+## ----message=FALSE, echo=FALSE------------------------------------------------
 library(timeDate)
 library(EpiCurve)
 library(scales)
 library(knitr)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 DF <- read.csv("daily_unaggregated_cases.csv", stringsAsFactors=FALSE)
 kable(head(DF, 12))
 
-## ----fig.width=6, fig.height=4.5-----------------------------------------
+## ----fig.width=6, fig.height=4.5----------------------------------------------
 EpiCurve(DF,
          date = "UTS", period = "day", colors ="#9900ef",
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 
-## ----fig.width=6, fig.height=4.5-----------------------------------------
+## ----fig.width=6, fig.height=4.5----------------------------------------------
 EpiCurve(DF,
          date = "UTS",
          period = "day",
@@ -21,11 +21,11 @@ EpiCurve(DF,
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)),
          square = F)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 DF <- read.csv("hourly_unaggregated_cases.csv", stringsAsFactors=FALSE)
 kable(head(DF, 12))
 
-## ----fig.width=5.5, fig.height=4.2---------------------------------------
+## ----fig.width=5.5, fig.height=4.2--------------------------------------------
 EpiCurve(DF,
          date = "UTS",
          period = "hour",
@@ -34,11 +34,11 @@ EpiCurve(DF,
          ylabel="Number of cases",
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 DF <- read.csv("hourly_unaggregated_cases_factors.csv", stringsAsFactors=FALSE)
 kable(head(DF, 12))
 
-## ----fig.width=5.5, fig.height=4.2---------------------------------------
+## ----fig.width=5.5, fig.height=4.2--------------------------------------------
 EpiCurve(DF,
          date = "UTS",
          period = "hour",
@@ -47,7 +47,7 @@ EpiCurve(DF,
          colors = c("#339933","#eebb00"),
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)))
 
-## ----fig.width=5.5, fig.height=4.2---------------------------------------
+## ----fig.width=5.5, fig.height=4.2--------------------------------------------
 EpiCurve(DF,
          date = "UTS",
          period = "hour",
@@ -57,7 +57,7 @@ EpiCurve(DF,
          xlabel=sprintf("From %s to %s", min(DF$UTS), max(DF$UTS)),
          square = FALSE)
 
-## ----echo=FALSE, warning=FALSE, , message=FALSE--------------------------
+## ----echo=FALSE, warning=FALSE, , message=FALSE-------------------------------
 library(timeDate)
 library(ggplot2)
 library(EpiCurve)
@@ -65,13 +65,13 @@ library(scales)
 library(knitr)
 
 
-## ---- echo=FALSE, message=FALSE------------------------------------------
+## ---- echo=FALSE, message=FALSE-----------------------------------------------
 DF <- read.csv("daily_aggregated_cases.csv", stringsAsFactors=FALSE)
 # DF$date <- as.Date(DF$date)
 kable(DF)
 
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -83,12 +83,12 @@ EpiCurve(DF,
 
 
 
-## ---- echo=FALSE, message=FALSE------------------------------------------
+## ---- echo=FALSE, message=FALSE-----------------------------------------------
 DF <- read.csv("daily_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
 # DF$date <- as.Date(DF$date)
 kable(DF)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -101,12 +101,12 @@ EpiCurve(DF,
 
 
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 DF <- read.csv("weekly_aggregated_cases.csv", stringsAsFactors=FALSE)
 kable(DF)
 
 
-## ----fig.width=4.5, fig.height=4.5---------------------------------------
+## ----fig.width=4.5, fig.height=4.5--------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -117,12 +117,12 @@ EpiCurve(DF,
          title = "Epidemic Curve\n")
 
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 DF <- read.csv2("weekly_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
 kable(DF)
 
 
-## ----fig.width=4, fig.height=4-------------------------------------------
+## ----fig.width=4, fig.height=4------------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -134,12 +134,12 @@ EpiCurve(DF,
          title = "Epidemic Curve\n")
 
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 DF <- read.csv2("monthly_aggregated_cases.csv", stringsAsFactors=FALSE)
 kable(DF)
 
 
-## ----fig.width=4.5, fig.height=4.5---------------------------------------
+## ----fig.width=4.5, fig.height=4.5--------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -149,12 +149,12 @@ EpiCurve(DF,
          title = "Epidemic Curve\n")
 
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 DF <- read.csv2("monthly_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
 kable(DF)
 
 
-## ----fig.width=4, fig.height=4-------------------------------------------
+## ----fig.width=4, fig.height=4------------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -165,13 +165,13 @@ EpiCurve(DF,
          title = "Epidemic Curve\n")
 
 
-## ---- echo=FALSE, message=FALSE------------------------------------------
+## ---- echo=FALSE, message=FALSE-----------------------------------------------
 DF <- read.csv("daily_aggregated_cases.csv", stringsAsFactors=FALSE)
 # DF$date <- as.Date(DF$date)
 kable(DF)
 
 
-## ----fig.height=8, fig.width=8-------------------------------------------
+## ----fig.height=8, fig.width=8------------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -184,7 +184,7 @@ EpiCurve(DF,
 
 
 
-## ----fig.height=7--------------------------------------------------------
+## ----fig.height=7-------------------------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -197,12 +197,12 @@ EpiCurve(DF,
 
 
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 DF <- read.csv("weekly_aggregated_cases.csv", stringsAsFactors=FALSE)
 kable(DF)
 
 
-## ----fig.width=4.5, fig.height=4.5---------------------------------------
+## ----fig.width=4.5, fig.height=4.5--------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",
@@ -214,12 +214,12 @@ EpiCurve(DF,
          title = "Epidemic Curve\n")
 
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 DF <- read.csv2("weekly_aggregated_cases_factors.csv", stringsAsFactors=FALSE)
 kable(DF)
 
 
-## ----fig.width=4, fig.height=4-------------------------------------------
+## ----fig.width=4, fig.height=4------------------------------------------------
 EpiCurve(DF,
          date = "date",
          freq = "value",

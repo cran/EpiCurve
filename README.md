@@ -8,6 +8,8 @@
 [![](https://cranlogs.r-pkg.org/badges/last-week/EpiCurve)](https://cran.r-project.org/package=EpiCurve)
 [![](https://cranlogs.r-pkg.org/badges/last-day/EpiCurve)](https://cran.r-project.org/package=EpiCurve)
 
+# EpiCurve 2.4-2
+- Bug solved : wrongs labels in x axis when plottin an hourly curve and dates cross over a month.
 
 # EpiCurve 2.4-1
 - parameter "square" added. If TRUE (default) squares are used to plot the curve, else if the number of cases is too hight please use square = FALSE

@@ -44,14 +44,13 @@ date.convert <- function(x, from, to) {
 
 # ===========================================================================
 # Create an hourly * split sequence
+# Example : 2021-06-26 00:00:00 2021-06-26 07:59:59 26 00:00-07:59
 # ===========================================================================
 createSequence <- function(minTime, maxTime, split) {
   str_split = sprintf("%d hour", split)
   offset = sprintf("%02d%s", split-1, ":59:59")
 
   minmore = 3600 * split * 2
-  #strMinTimeDateStart <-as.character(round(as.timeDate(minTime)-minmore, "hours"))
-  # strMinTimeDateEnd <- as.character(round(as.timeDate(maxTime)+minmore, "hours") - 1)
   strMinTimeDateStart <-paste(substr(minTime, 1,10), "00:00:00", sep=" ")
   strMinTimeDateEnd <- as.character(as.timeDate(strMinTimeDateStart) + 3600*(split-0.999999))
   strMinTimeDateEnd <- paste(substr(strMinTimeDateEnd, 1,13), "59:59", sep=":")
@@ -59,13 +58,10 @@ createSequence <- function(minTime, maxTime, split) {
   strMaxTimeDateEnd <-paste(substr(maxTime,1,10), "23:59:59", sep=" ")
   TLow <- seq(as.timeDate(strMinTimeDateStart), as.timeDate(strMaxTimeDateEnd), by=str_split)
   THight <- seq(as.timeDate(strMinTimeDateEnd), as.timeDate(strMaxTimeDateEnd), by=str_split)
-  # print(TLow)
-  # print(THight)
-  # return(T)
   F1 <- format(TLow, "%d %H:%M")
   F2 <- format(THight, "%H:%M")
   Dico <- paste(F1, F2, sep="-")
-  df <- data.frame(TLow, THight, Dico, stringsAsFactors=TRUE)
+  df <- data.frame(TLow, THight, Dico, stringsAsFactors=FALSE)
   colnames(df) <- c("L", "H", "D")
   df
 }
@@ -91,7 +87,8 @@ setFactors <- function(df1, df2) {
       found <- FALSE
       for (j in 1:nrow(df2)) {
         if (in.date(x[i], L[j], H[j]) == TRUE) {
-          R <- c(R, levels(D)[j])
+          # R <- c(R, levels(D)[j])
+          R <- c(R, as.character(D[j]))
           found <- TRUE
           break
         }
@@ -271,11 +268,9 @@ EpiCurve <- function(x,
     DF <- mutate(DF, Day = format(Date, "%Y-%m-%d")) %>%
       mutate(Date = NULL) %>%
       mutate(Date = as.Date(Day, format= "%Y-%m-%d"))
-    cat("Day\n")
-    str(DF)
     minDate = min(DF$Date)
     maxDate = max(DF$Date)
-#    return(DF)
+
   }
 
     if (period == "week") {
@@ -307,20 +302,19 @@ EpiCurve <- function(x,
       stop("split value MUST be in {1,2,3,4,6,8,12}")
     }
 
-    # cat("DF origin:", nrow(DF), "\n")
-
     DF$Date <- as.character(as.timeDate(DF$Date))
     minDate <- as.character(min(as.timeDate(DF$Date)))
     maxDate <- as.character(max(as.timeDate(DF$Date)))
 
     L <- createSequence(minDate, maxDate, split)
-    # cat("DF :", nrow(DF), "\n")
+
     DF <- setFactors(DF, L)
-    # return(DF)
+
     L <- dplyr::rename(L, Date = D) %>%
       select(Date) %>%
-      mutate(Date = levels(Date)) %>%
-      as.data.frame()
+      mutate(Date = as.character(Date)) %>%
+      as.data.frame(stringsAsFactors=FALSE)
+
     DF <- DF %>%
       group_by(DateFactor, Cut) %>%
       summarise(Freq=n()) %>%
@@ -339,6 +333,7 @@ EpiCurve <- function(x,
     } else {
       MaxValue = max(DF$Freq, na.rm = TRUE)
     }
+    DF$Date <- factor(DF$Date, levels = unique(DF$Date), ordered = TRUE)
   }
 
   # Init pseudo variables (in AES) for packaging

@@ -1,11 +1,11 @@
-a2c3f2baa16deb5e98abcf76c60f6758 *DESCRIPTION
+4f848a0567ea75ee7d9d16888949191c *DESCRIPTION
 a69b91d9806bbc2a2f99cd9b27f9cc40 *NAMESPACE
-c3b7d2d4a5e46e68cffca634b56e2142 *R/EpiCurve..R
-b068f984f20c872adc87d0dec1524857 *README.md
+184af8e58b604dd4a7c2d054798532d2 *R/EpiCurve..R
+57c957f42c5704d80591c3963f415df5 *README.md
 bd189ec07e6da83006b6f606201f439e *build/vignette.rds
-55a54dcf3b2ae7b64e0595dae9fb7f01 *inst/doc/EpiCurve.R
+d8ec68e3bdbd0a9a7116299e0558bdea *inst/doc/EpiCurve.R
 7bf98f6f4ad56e88f93d67bceeb3f5c9 *inst/doc/EpiCurve.Rmd
-990001f7989ef0d743dad7595a20b048 *inst/doc/EpiCurve.pdf
+30fea9501677c2b5469f305085d7df04 *inst/doc/EpiCurve.pdf
 21e811c2825b6c3b6f330d01562dab73 *man/EpiCurve.Rd
 7bf98f6f4ad56e88f93d67bceeb3f5c9 *vignettes/EpiCurve.Rmd
 33e802d3415139ffa9ee19f1b4f83fb3 *vignettes/daily_aggregated_cases.csv
